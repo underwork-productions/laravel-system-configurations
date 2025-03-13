@@ -1,0 +1,78 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Underwork\SystemConfiguration\Exceptions\MissingConfigFile;
+use Underwork\SystemConfiguration\Exceptions\MissingModelModuleTableName;
+use Underwork\SystemConfiguration\Exceptions\MissingSystemModuleTableName;
+
+return new class extends Migration
+{
+    public function up()
+    {
+        $tables = config('system-configurations.tables');
+        $modules = config('system-configurations.modules');
+
+        if (empty($tables)) {
+            throw MissingConfigFile::create();
+        }
+
+        if ($modules['system'] === true && empty($tables['system_configurations'])) {
+            throw MissingSystemModuleTableName::create();
+        }
+
+        $this->upSystemConfigurationTable($tables['system_configurations'], $modules['system'] === true);
+    }
+
+    public function down()
+    {
+        $tables = config('system-configurations.tables');
+
+        if (empty($tables)) {
+            throw MissingConfigFile::create();
+        }
+
+        Schema::dropIfExists($tables['system_configurations']);
+        Schema::dropDatabaseIfExists($tables['configurable']);
+    }
+
+    /**
+     * This will create the system configurations table if it is enabled on the configurations file.
+     */
+    private function upSystemConfigurationTable(string $table, bool $enabled)
+    {
+        if (! $enabled) {
+            return;
+        }
+
+        Schema::create($table, static function (Blueprint $table) {
+            $table->ulid('id')->primary()->unique();
+
+            $table->string('key');
+
+            $table->string('group')->nullable();
+
+            $table->json('value')->nullable()->comment('The current value of this configuration');
+
+            $table->enum('type', [
+                'boolean',
+                'float',
+                'integer',
+                'text',
+                'secret', // This will not hash the value.
+                'string',
+            ])->default('string');
+
+            $table->text('rules')->nullable()->comment('Validation rules for this configuration.');
+
+            $table->json('default')->nullable()->comment('The default value this configuration will have.');
+
+            $table->unique(['key', 'group'], 'unique_key_group');
+
+            $table->index(['key', 'group'], 'index_key_group');
+
+            $table->timestamps();
+        });
+    }
+};
