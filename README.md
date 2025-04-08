@@ -36,32 +36,6 @@ You can publish the config file with:
 php artisan vendor:publish --tag="system-configurations-config"
 ```
 
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="system-configurations-views"
-```
-
-## Usage
-
-```php
-$systemConfiguration = new Underwork\SystemConfiguration();
-echo $systemConfiguration->echoPhrase('Hello, Underwork!');
-```
-
-## Testing
-
-```bash
-composer test
-```
-
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
