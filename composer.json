@@ -1,6 +1,7 @@
 {
-    "name": "underwork-productions/laravel-system-configurations",
+    "name": "underwork/laravel-system-configurations",
     "description": "This is my package laravel-system-configurations",
+    "version": "0.0.1",
     "keywords": [
         "underwork",
         "laravel",
