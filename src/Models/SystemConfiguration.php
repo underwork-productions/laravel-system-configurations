@@ -112,4 +112,12 @@ class SystemConfiguration extends Model implements SystemConfigurationContract
 
         return parent::save($options);
     }
+
+    /**
+     * This function allows to skip the validation of the value.
+     */
+    public function saveUnsafe(array $options = [])
+    {
+        return parent::save($options);
+    }
 }
